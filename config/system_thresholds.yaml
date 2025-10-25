@@ -1,0 +1,71 @@
+# System Thresholds Configuration for Titan Fall AI
+
+# Fault detection thresholds
+fault_thresholds:
+  # Joint thresholds
+  joint_position_limit: 3.2  # rad
+  joint_velocity_limit: 12.0  # rad/s
+  joint_torque_limit: 300.0   # Nm
+  
+  # Sensor thresholds
+  imu_acceleration_limit: 50.0  # m/s²
+  imu_angular_velocity_limit: 20.0  # rad/s
+  
+  # Communication thresholds
+  sensor_timeout: 1.0  # seconds
+  communication_timeout: 2.0  # seconds
+  
+  # Power thresholds
+  voltage_min: 20.0  # V
+  voltage_max: 30.0  # V
+  current_limit: 50.0  # A
+  
+  # Thermal thresholds
+  temperature_warning: 60.0  # °C
+  temperature_critical: 75.0  # °C
+  temperature_max: 80.0  # °C
+
+# System limits
+system_limits:
+  # Update rates
+  sensor_fusion_rate: 100.0  # Hz
+  intent_model_rate: 10.0    # Hz
+  torque_controller_rate: 100.0  # Hz
+  energy_manager_rate: 10.0  # Hz
+  fault_detection_rate: 10.0  # Hz
+  thermal_manager_rate: 5.0  # Hz
+  
+  # Buffer sizes
+  sensor_history_size: 1000
+  fault_history_size: 1000
+  intent_history_size: 100
+  
+  # Timeouts
+  initialization_timeout: 10.0  # seconds
+  shutdown_timeout: 5.0  # seconds
+
+# Safety settings
+safety_settings:
+  emergency_stop_enabled: true
+  thermal_protection_enabled: true
+  battery_protection_enabled: true
+  fault_tolerance_level: "medium"  # low, medium, high
+  
+  # Auto-recovery settings
+  auto_recovery_enabled: true
+  max_recovery_attempts: 3
+  recovery_timeout: 30.0  # seconds
+
+# Performance thresholds
+performance_thresholds:
+  # Latency thresholds
+  control_latency_max: 0.01  # seconds
+  sensor_latency_max: 0.005  # seconds
+  
+  # Accuracy thresholds
+  position_accuracy_min: 0.01  # rad
+  velocity_accuracy_min: 0.1   # rad/s
+  
+  # Efficiency thresholds
+  power_efficiency_min: 0.7   # 70%
+  thermal_efficiency_min: 0.8 # 80%

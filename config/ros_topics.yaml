@@ -1,0 +1,55 @@
+# ROS 2 Topics Configuration for Titan Fall AI
+
+# Topic names
+topics:
+  # Sensor topics
+  imu_data: "/imu"
+  joint_states: "/joint_states"
+  temperature_data: "/temperature"
+  battery_voltage: "/battery_voltage"
+  
+  # Control topics
+  joint_torques: "/joint_torques"
+  joint_commands: "/joint_commands"
+  target_velocity: "/target_velocity"
+  
+  # System topics
+  fused_odometry: "/fused_odometry"
+  current_pose: "/current_pose"
+  current_velocity: "/current_velocity"
+  predicted_intent: "/predicted_intent"
+  predicted_velocity: "/predicted_velocity"
+  
+  # Status topics
+  fault_detected: "/fault_detected"
+  fault_event: "/fault_event"
+  fault_count: "/fault_count"
+  total_power_usage: "/total_power_usage"
+  low_battery_warning: "/low_battery_warning"
+  power_mode: "/power_mode"
+  average_temperature: "/average_temperature"
+  thermal_warning: "/thermal_warning"
+  cooling_mode: "/cooling_mode"
+  
+  # User input
+  user_input: "/user_input"
+
+# QoS settings
+qos_settings:
+  default:
+    reliability: "reliable"
+    durability: "volatile"
+    history: "keep_last"
+    depth: 10
+  
+  sensor_data:
+    reliability: "best_effort"
+    durability: "volatile"
+    history: "keep_last"
+    depth: 5
+  
+  control_commands:
+    reliability: "reliable"
+    durability: "volatile"
+    history: "keep_last"
+    depth: 1
