@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>titanfall_ai</name>
+  <version>1.0.0</version>
+  <description>Titan Fall AI - Advanced Exosuit Control System</description>
+  <maintainer email="bryce@titanforge.com">Bryce K. Courtney</maintainer>
+  <license>MIT</license>
+
+  <author email="bryce@titanforge.com">Bryce K. Courtney</author>
+  <url type="website">https://github.com/titanforge/titanfall_ai</url>
+  <url type="bugtracker">https://github.com/titanforge/titanfall_ai/issues</url>
+  <url type="repository">https://github.com/titanforge/titanfall_ai</url>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>gazebo_ros</depend>
+  <depend>gazebo_ros_pkgs</depend>
+  <depend>gazebo_ros_control</depend>
+  <depend>controller_manager</depend>
+  <depend>joint_state_broadcaster</depend>
+  <depend>joint_trajectory_controller</depend>
+  <depend>position_controllers</depend>
+  <depend>velocity_controllers</depend>
+  <depend>effort_controllers</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
