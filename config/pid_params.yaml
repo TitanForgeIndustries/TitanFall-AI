@@ -1,0 +1,109 @@
+# PID Controller Parameters for Titan Fall AI
+
+pid_controllers:
+  # Left leg joints
+  hip_left:
+    kp: 100.0
+    ki: 10.0
+    kd: 5.0
+    integral_limit: 50.0
+    output_limit: 200.0
+    deadband: 0.01
+    
+  knee_left:
+    kp: 120.0
+    ki: 15.0
+    kd: 8.0
+    integral_limit: 60.0
+    output_limit: 250.0
+    deadband: 0.01
+    
+  ankle_left:
+    kp: 80.0
+    ki: 8.0
+    kd: 4.0
+    integral_limit: 40.0
+    output_limit: 150.0
+    deadband: 0.01
+    
+  # Right leg joints
+  hip_right:
+    kp: 100.0
+    ki: 10.0
+    kd: 5.0
+    integral_limit: 50.0
+    output_limit: 200.0
+    deadband: 0.01
+    
+  knee_right:
+    kp: 120.0
+    ki: 15.0
+    kd: 8.0
+    integral_limit: 60.0
+    output_limit: 250.0
+    deadband: 0.01
+    
+  ankle_right:
+    kp: 80.0
+    ki: 8.0
+    kd: 4.0
+    integral_limit: 40.0
+    output_limit: 150.0
+    deadband: 0.01
+
+# Joint limits
+joint_limits:
+  hip_left:
+    min_position: -1.57
+    max_position: 1.57
+    min_velocity: -10.0
+    max_velocity: 10.0
+    min_torque: -200.0
+    max_torque: 200.0
+    
+  knee_left:
+    min_position: 0.0
+    max_position: 3.14
+    min_velocity: -10.0
+    max_velocity: 10.0
+    min_torque: -250.0
+    max_torque: 250.0
+    
+  ankle_left:
+    min_position: -0.5
+    max_position: 0.5
+    min_velocity: -5.0
+    max_velocity: 5.0
+    min_torque: -150.0
+    max_torque: 150.0
+    
+  hip_right:
+    min_position: -1.57
+    max_position: 1.57
+    min_velocity: -10.0
+    max_velocity: 10.0
+    min_torque: -200.0
+    max_torque: 200.0
+    
+  knee_right:
+    min_position: 0.0
+    max_position: 3.14
+    min_velocity: -10.0
+    max_velocity: 10.0
+    min_torque: -250.0
+    max_torque: 250.0
+    
+  ankle_right:
+    min_position: -0.5
+    max_position: 0.5
+    min_velocity: -5.0
+    max_velocity: 5.0
+    min_torque: -150.0
+    max_torque: 150.0
+
+# Control settings
+control_settings:
+  control_rate: 100.0  # Hz
+  control_mode: "position"  # position, velocity, torque
+  safety_limits_enabled: true
+  emergency_stop: false
