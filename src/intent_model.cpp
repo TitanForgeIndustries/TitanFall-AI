@@ -3,8 +3,9 @@
 namespace titanfall_ai {
 
 IntentModel::IntentModel(rclcpp::Node::SharedPtr node)
-    : node_(node), prediction_horizon_(2.0), confidence_threshold_(0.7), 
-      learning_rate_(0.01), prediction_rate_(10.0) {
+    : node_(node), prediction_horizon_(2.0), confidence_threshold_(0.7),
+      learning_rate_(0.01), prediction_rate_(10.0), use_ml_model_(false),
+      gamma_(0.95), epsilon_(0.1) {
     initialize();
 }
 
@@ -59,10 +60,35 @@ void IntentModel::userInputCallback(const std_msgs::msg::String::SharedPtr msg) 
 }
 
 void IntentModel::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg) {
-    // Extract features from joint state for pattern recognition
-    std::vector<double> features = extractFeatures(*msg, geometry_msgs::msg::Pose());
-    feature_history_.push_back(features);
-    
+    // Extract advanced features from joint state for pattern recognition
+    std::vector<double> features = extractAdvancedFeatures(*msg, geometry_msgs::msg::Pose());
+
+    // Add to temporal buffer
+    temporal_feature_buffer_.push_back(features);
+    if (temporal_feature_buffer_.size() > TEMPORAL_WINDOW_SIZE) {
+        temporal_feature_buffer_.pop_front();
+    }
+
+    // Apply temporal processing if we have enough history
+    if (temporal_feature_buffer_.size() >= 3) {
+        // Apply temporal convolution
+        auto conv_features = applyTemporalConvolution(temporal_feature_buffer_);
+
+        // Apply attention mechanism
+        auto attended_features = applyAttentionMechanism(temporal_feature_buffer_);
+
+        // Combine features (simple concatenation, could use more sophisticated fusion)
+        std::vector<double> combined_features = features;
+        combined_features.insert(combined_features.end(),
+                                conv_features.begin(), conv_features.end());
+        combined_features.insert(combined_features.end(),
+                                attended_features.begin(), attended_features.end());
+
+        feature_history_.push_back(combined_features);
+    } else {
+        feature_history_.push_back(features);
+    }
+
     if (feature_history_.size() > 1000) {
         feature_history_.erase(feature_history_.begin());
     }

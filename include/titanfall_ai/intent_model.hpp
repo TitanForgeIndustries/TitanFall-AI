@@ -11,6 +11,19 @@
 #include <string>
 #include <map>
 #include <queue>
+#include <deque>
+#include <algorithm>
+#include <numeric>
+#include <cmath>
+#include <fstream>
+
+// TensorFlow Lite includes (optional - will use fallback if not available)
+#ifdef USE_TFLITE
+#include <tensorflow/lite/interpreter.h>
+#include <tensorflow/lite/kernels/register.h>
+#include <tensorflow/lite/model.h>
+#include <tensorflow/lite/optional_debug_tools.h>
+#endif
 
 namespace titanfall_ai {
 
@@ -93,19 +106,72 @@ private:
     // Pattern recognition
     std::vector<std::vector<double>> feature_history_;
     std::vector<IntentType> label_history_;
-    
+
     // Timing
     rclcpp::Time last_prediction_time_;
     double prediction_rate_;
-    
+
+    // TensorFlow Lite model
+#ifdef USE_TFLITE
+    std::unique_ptr<tflite::FlatBufferModel> tflite_model_;
+    std::unique_ptr<tflite::Interpreter> tflite_interpreter_;
+    tflite::ops::builtin::BuiltinOpResolver tflite_resolver_;
+#endif
+    bool use_ml_model_;
+    std::string model_path_;
+
+    // Advanced feature extraction
+    static constexpr size_t TEMPORAL_WINDOW_SIZE = 30;  // 3 seconds at 10Hz
+    static constexpr size_t FEATURE_DIM = 20;  // Extended feature dimension
+    std::deque<std::vector<double>> temporal_feature_buffer_;
+
+    // Attention mechanism weights
+    std::vector<double> attention_weights_;
+
+    // Online learning
+    struct ExperienceReplay {
+        std::vector<double> features;
+        IntentType intent;
+        bool success;
+        double reward;
+        rclcpp::Time timestamp;
+    };
+    std::deque<ExperienceReplay> replay_buffer_;
+    static constexpr size_t MAX_REPLAY_BUFFER_SIZE = 10000;
+
+    // Q-learning parameters
+    std::map<std::pair<IntentType, IntentType>, double> q_table_;
+    double gamma_;  // Discount factor
+    double epsilon_;  // Exploration rate
+
     // Internal methods
     std::vector<double> extractFeatures(const sensor_msgs::msg::JointState& joint_state,
                                       const geometry_msgs::msg::Pose& pose);
+    std::vector<double> extractAdvancedFeatures(const sensor_msgs::msg::JointState& joint_state,
+                                               const geometry_msgs::msg::Pose& pose);
+    std::vector<double> applyTemporalConvolution(const std::deque<std::vector<double>>& temporal_data);
+    std::vector<double> applyAttentionMechanism(const std::deque<std::vector<double>>& temporal_data);
+
     IntentCommand classifyIntent(const std::vector<double>& features);
+    IntentCommand classifyIntentML(const std::vector<double>& features);
+    IntentCommand classifyIntentRuleBased(const std::vector<double>& features);
+
     double calculateConfidence(const std::vector<double>& features, IntentType intent);
     void updatePatternDatabase(const std::vector<double>& features, IntentType intent);
     IntentCommand parseUserInput(const std::string& input);
     void publishIntentPrediction();
+
+    // TensorFlow Lite helpers
+    bool initializeTFLite();
+    std::vector<float> preprocessFeaturesForML(const std::vector<double>& features);
+    IntentType postprocessMLOutput(const std::vector<float>& output);
+
+    // Online learning helpers
+    void updateQTable(const ExperienceReplay& experience);
+    double getQValue(IntentType current, IntentType next);
+    void setQValue(IntentType current, IntentType next, double value);
+    IntentType selectActionEpsilonGreedy(IntentType current_state);
+    double calculateReward(const IntentCommand& intent, bool success);
 };
 
 } // namespace titanfall_ai
