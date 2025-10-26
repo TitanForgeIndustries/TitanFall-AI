@@ -5,6 +5,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# C++17 required for advanced features
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -14,6 +18,17 @@ find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+
+# Optional: TensorFlow Lite
+find_package(TensorflowLite QUIET)
+if(TensorflowLite_FOUND)
+  message(STATUS "TensorFlow Lite found - ML inference enabled")
+  add_compile_definitions(USE_TFLITE)
+  set(TFLITE_LIBS tensorflow-lite)
+else()
+  message(STATUS "TensorFlow Lite not found - using rule-based fallback")
+  set(TFLITE_LIBS "")
+endif()
 
 # Include directories
 include_directories(include)
@@ -39,14 +54,25 @@ ament_target_dependencies(titanfall_ai_lib
   tf2_ros
 )
 
-# Create executable
+# Create main executable
 add_executable(titanfall_ai_node src/main.cpp)
-target_link_libraries(titanfall_ai_node titanfall_ai_lib)
+target_link_libraries(titanfall_ai_node titanfall_ai_lib ${TFLITE_LIBS})
+
+# Create example executable
+add_executable(intent_recognition_example examples/intent_recognition_example.cpp)
+target_link_libraries(intent_recognition_example titanfall_ai_lib ${TFLITE_LIBS})
+ament_target_dependencies(intent_recognition_example
+  rclcpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+)
 
 # Install targets
 install(TARGETS
   titanfall_ai_lib
   titanfall_ai_node
+  intent_recognition_example
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -78,6 +104,24 @@ install(DIRECTORY models/
 # Install data directory
 install(DIRECTORY data/
   DESTINATION share/${PROJECT_NAME}/data
+)
+
+# Install scripts
+install(PROGRAMS
+  scripts/train_intent_model.py
+  scripts/collect_training_data.py
+  scripts/test_intent_model.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install documentation
+install(DIRECTORY docs/
+  DESTINATION share/${PROJECT_NAME}/docs
+)
+
+# Install examples
+install(DIRECTORY examples/
+  DESTINATION share/${PROJECT_NAME}/examples
 )
 
 ament_package()
