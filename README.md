@@ -12,21 +12,30 @@ Titan Fall AI is an advanced exosuit control system built on ROS 2 and Gazebo. T
 
 ### Core Systems
 - **Sensor Fusion**: Multi-sensor data fusion using Kalman and complementary filters
-- **Intent Model**: AI-powered user intent recognition and prediction
+- **Intent Model**: AI-powered user intent recognition and prediction with TensorFlow Lite
 - **Torque Controller**: Advanced PID-based torque control with safety limits
 - **Energy Manager**: Intelligent power management and battery optimization
 - **Fault Detection**: Real-time fault detection and system health monitoring
 - **Thermal Manager**: Thermal monitoring and cooling system control
 
+### AI & Machine Learning Features
+- **TensorFlow Lite Integration**: Neural network inference in C++ for real-time intent prediction
+- **Advanced Feature Extraction**: Temporal convolutions and attention mechanisms for sensor data
+- **Online Learning**: Q-learning based reinforcement learning for continuous improvement
+- **Multiple Model Architectures**: Support for MLP, LSTM, and CNN models
+- **Python Training Pipeline**: Complete workflow for data collection, training, and deployment
+- **Experience Replay**: Stores and learns from past experiences (10,000 sample buffer)
+
 ### Key Capabilities
-- Real-time sensor data processing
-- Predictive intent recognition
-- Adaptive torque control
+- Real-time sensor data processing with advanced feature extraction
+- Predictive intent recognition using deep learning
+- Adaptive torque control with learned policies
 - Dynamic power optimization
 - Comprehensive fault detection
 - Thermal protection systems
 - Gazebo simulation support
 - ROS 2 integration
+- Continuous learning from real-world experience
 
 ## Prerequisites
 
@@ -38,8 +47,9 @@ Titan Fall AI is an advanced exosuit control system built on ROS 2 and Gazebo. T
 - CMake 3.8+
 
 ### Dependencies
+
+#### ROS 2 Packages
 ```bash
-# ROS 2 packages
 sudo apt install ros-humble-rclcpp ros-humble-std-msgs ros-humble-sensor-msgs
 sudo apt install ros-humble-geometry-msgs ros-humble-nav-msgs ros-humble-tf2
 sudo apt install ros-humble-tf2-ros ros-humble-tf2-geometry-msgs
@@ -48,6 +58,26 @@ sudo apt install ros-humble-gazebo-ros-control ros-humble-controller-manager
 sudo apt install ros-humble-joint-state-broadcaster ros-humble-joint-trajectory-controller
 sudo apt install ros-humble-position-controllers ros-humble-velocity-controllers
 sudo apt install ros-humble-effort-controllers
+```
+
+#### TensorFlow Lite (Optional - for ML inference)
+```bash
+# Install TensorFlow Lite C++ library
+# Option 1: Build from source (recommended)
+git clone https://github.com/tensorflow/tensorflow.git
+cd tensorflow
+./tensorflow/lite/tools/make/download_dependencies.sh
+./tensorflow/lite/tools/make/build_lib.sh
+
+# Option 2: Use pre-built package (if available)
+# The system will fall back to rule-based classification if TFLite is not available
+```
+
+#### Python Dependencies (for training)
+```bash
+cd scripts
+pip install -r requirements.txt
+```
 
 # Additional tools
 sudo apt install python3-colcon-common-extensions python3-rosdep
@@ -84,7 +114,26 @@ source install/setup.bash
 
 ## Usage
 
+### 🚀 Quick Start (5 Minutes)
+
+```bash
+# 1. Build and source
+colcon build --packages-select titanfall_ai
+source install/setup.bash
+
+# 2. Run your first example
+ros2 run titanfall_ai intent_recognition_example 1
+
+# 3. Train your first AI model
+cd src/TitanFall-AI
+python3 scripts/collect_training_data.py --demo
+python3 scripts/train_intent_model.py --synthetic --epochs 20
+```
+
+**🎉 Success!** You've just trained your first AI model!
+
 ### Running the Simulation
+
 ```bash
 # Launch the complete simulation
 ros2 launch titanfall_ai titanfall_sim.launch.py
@@ -94,6 +143,27 @@ ros2 launch titanfall_ai gazebo_world.launch.py
 
 # Run the main AI node
 ros2 run titanfall_ai titanfall_ai_node
+
+# Run intent recognition examples
+ros2 run titanfall_ai intent_recognition_example 1  # Basic demo
+ros2 run titanfall_ai intent_recognition_example 2  # Advanced callbacks
+ros2 run titanfall_ai intent_recognition_example 3  # Batch training
+ros2 run titanfall_ai intent_recognition_example 4  # Real-time recognition
+```
+
+### Training AI Models
+
+```bash
+# Collect training data from ROS bags
+python3 scripts/collect_training_data.py --bag_dir ./rosbags --output_dir ./data/training
+
+# Train with different architectures
+python3 scripts/train_intent_model.py --architecture mlp --epochs 100
+python3 scripts/train_intent_model.py --architecture lstm --epochs 150
+python3 scripts/train_intent_model.py --architecture cnn --epochs 100
+
+# Test trained model
+python3 scripts/test_intent_model.py --model_path ./models/intent_model.tflite
 ```
 
 ### Configuration
@@ -181,19 +251,112 @@ geometry_msgs::msg::Pose pose = sensor_fusion.getCurrentPose();
 sensor_fusion.setFusionParameters(0.98, 0.02, 0.01);
 ```
 
-### Intent Model
+### Intent Model (AI-Powered)
+
+The intent recognition system uses advanced machine learning with TensorFlow Lite and online learning capabilities.
+
 ```cpp
+// Load pre-trained TensorFlow Lite model
+intent_model.loadModel("/path/to/intent_model.tflite");
+
 // Get intent prediction
-IntentCommand intent = intent_model.predictNextIntent();
+IntentCommand current_intent = intent_model.recognizeCurrentIntent();
+IntentCommand predicted_intent = intent_model.predictNextIntent();
 
 // Configure model
-intent_model.setPredictionHorizon(2.0);
-intent_model.setConfidenceThreshold(0.7);
+intent_model.setPredictionHorizon(2.0);      // Predict 2 seconds ahead
+intent_model.setConfidenceThreshold(0.7);    // 70% confidence threshold
+
+// Enable/disable specific intents
+intent_model.enableIntentType(IntentType::JUMP, true);
+
+// Online learning - provide feedback
+bool execution_success = executeIntent(predicted_intent);
+intent_model.updateModel(predicted_intent, execution_success);
+
+// Save learned model
+intent_model.saveModel("/path/to/learned_model.dat");
 ```
+
+**Features:**
+- **TensorFlow Lite Integration**: Neural network inference in C++
+- **Advanced Feature Extraction**: Temporal convolutions and attention mechanisms
+- **Online Learning**: Q-learning for continuous improvement
+- **Multiple Architectures**: MLP, LSTM, and CNN support
+
+**Training Your Own Model:**
+
+```bash
+# 1. Collect training data from ROS bags
+python3 scripts/collect_training_data.py --bag_dir ./rosbags --output_dir ./data/training
+
+# 2. Train the model
+python3 scripts/train_intent_model.py --architecture mlp --epochs 100 --output_dir ./models
+
+# 3. Load in C++
+intent_model.loadModel("./models/intent_model_YYYYMMDD_HHMMSS.tflite");
+```
+
+See [Training Pipeline Documentation](scripts/README_TRAINING.md) and [Online Learning Guide](docs/ONLINE_LEARNING.md) for details.
+
+## 📚 Documentation
+
+### Getting Started
+- **[Getting Started Guide](docs/GETTING_STARTED.md)** - Your first steps with TitanFall AI
+- **[Installation Guide](docs/INSTALLATION_GUIDE.md)** - Complete installation instructions
+- **[Quick Reference](docs/QUICK_REFERENCE.md)** - API and command reference
+
+### AI & Machine Learning
+- **[AI Features Summary](docs/AI_FEATURES_SUMMARY.md)** - Complete overview of AI capabilities
+- **[Online Learning Guide](docs/ONLINE_LEARNING.md)** - Deep dive into Q-learning and RL
+- **[Training Pipeline](scripts/README_TRAINING.md)** - Data collection and model training
+
+### Examples & Tutorials
+- **[Intent Recognition Examples](examples/intent_recognition_example.cpp)** - Four complete usage examples
+- **Training Scripts**: `scripts/train_intent_model.py`, `scripts/collect_training_data.py`
+- **Testing Script**: `scripts/test_intent_model.py`
+
+### Architecture Diagrams
+The documentation includes interactive Mermaid diagrams showing:
+- Intent recognition architecture
+- Training pipeline workflow
+- System component interactions
 
 ## Testing
 
+### Run Examples
+
+```bash
+# Basic intent recognition demo
+ros2 run titanfall_ai intent_recognition_example 1
+
+# Advanced usage with callbacks
+ros2 run titanfall_ai intent_recognition_example 2
+
+# Batch training workflow
+ros2 run titanfall_ai intent_recognition_example 3
+
+# Real-time intent recognition
+ros2 run titanfall_ai intent_recognition_example 4
+```
+
+### Test Trained Models
+
+```bash
+# Test a trained model
+python3 scripts/test_intent_model.py \
+    --model_path ./models/intent_model.tflite \
+    --data_dir ./data/training \
+    --output_dir ./test_results
+
+# View results
+# - test_results/confusion_matrix.png
+# - test_results/confidence_distribution.png
+# - test_results/per_class_accuracy.png
+```
+
 ### Unit Tests
+
 ```bash
 # Run unit tests
 colcon test --packages-select titanfall_ai
